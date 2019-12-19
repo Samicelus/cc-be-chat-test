@@ -1,0 +1,6 @@
+{
+    "0": "noConnection",
+    "1": "loggedOut",
+    "2": "connecting",
+    "3": "loggedIn"
+}
