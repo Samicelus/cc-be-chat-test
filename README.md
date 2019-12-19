@@ -64,7 +64,7 @@ Abused words are filtered using DFA and trie.
 Words list file is placed in ./lib/default/abuse/
 
 Data structure implementation from:
-[![](https://github.com/trekhleb/javascript-algorithms)]
+[@trekhleb/javascript-algorithms](https://github.com/trekhleb/javascript-algorithms)
 
 # NPM packages added
 
