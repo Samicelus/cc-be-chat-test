@@ -21,7 +21,7 @@ class UserService{
         let message = {
             type: "regist"
         };
-        if(user.trim() && !Object.keys(this.users).includes(user)){
+        if(!/\s+/.test(user) && user.trim() && !Object.keys(this.users).includes(user)){
             this.users[user] = {
                 name: user,
                 loggedIn: new moment().format('YYYY-MM-DD HH:mm:ss'),
