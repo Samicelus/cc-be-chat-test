@@ -16,7 +16,7 @@ class Processor{
                 this[type](content, user, time);
             }
         }catch(e){
-            console.error(e);
+            throw e;
         }
     }
 
