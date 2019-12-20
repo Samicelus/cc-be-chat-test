@@ -2,14 +2,19 @@ const inquirer = require('inquirer');
 const WebSocket = require('ws');
 const serverConfig = require('./config/serverConfig.json');
 const ws = new WebSocket(`ws://${serverConfig.host}${serverConfig.port?":"+serverConfig.port:""}`);
+
+const events = require('events');
+class EventHandler extends events{}
+const eventHandler = new EventHandler();
+
 const Messenger = require('./domains/wsMessenger');
-const messenger = new Messenger("", ws);
+const messenger = new Messenger("", ws, eventHandler);
 const commands = require('./constants/commands.json');
 let clientInfo = {
   state: "0"
 };
 const Processor = require('./domains/messageProcessor');
-const processor = new Processor(clientInfo, messenger);
+const processor = new Processor(clientInfo, messenger, eventHandler);
 
 const readline = require('readline');
 const rl = readline.createInterface({

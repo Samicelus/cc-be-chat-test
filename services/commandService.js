@@ -3,7 +3,9 @@ const commands = require('../constants/commands.json');
 class commandService{
     constructor(){
         this.wss;
+        this.eventHandler;
         this.setWss = this.setWss.bind(this);
+        this.setEvents = this.setEvents.bind(this);
         this.execommand = this.execommand.bind(this);
         this.popular = this.popular.bind(this);
         this.stats = this.stats.bind(this);
@@ -11,6 +13,12 @@ class commandService{
     
     setWss(wss){
         this.wss = wss;
+    }
+
+    setEvents(eventHandler){
+        this.eventHandler = eventHandler;
+
+        let that = this;
     }
 
     execommand(ws, content){
@@ -21,11 +29,11 @@ class commandService{
     }
 
     popular(ws){
-        this.wss.messageService.replyPopular(ws)
+        this.eventHandler.emit("popular", ws);
     }
 
     stats(ws, user){
-        this.wss.userService.replyStats(ws, user);
+        this.eventHandler.emit("status", ws, user);
     }
 }
 

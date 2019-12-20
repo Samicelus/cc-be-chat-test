@@ -2,11 +2,21 @@ const messageTypes = require('../constants/messageTypes.json');
 const moment = require('moment'); 
 
 class Processor{
-    constructor(clientInfo, messenger){
+    constructor(clientInfo, messenger, eventHandler){
         this.clientInfo = clientInfo;
         this.messenger = messenger;
+        this.eventHandler = eventHandler;
         this.process = this.process.bind(this);
         this.regist = this.regist.bind(this);
+
+        let that = this;
+        this.eventHandler.on("login", function(){
+            that.clientInfo.state = "3";
+        });
+        this.eventHandler.on("logout", function(){
+            that.clientInfo.state = "1";
+            console.log(`${content}, please enter your name:`);
+        });
     }
 
     process(incoming){
@@ -22,12 +32,14 @@ class Processor{
 
     regist(content){
         if(content == "OK"){
-            this.clientInfo.state = "3";
-            this.messenger.setUser();
-            console.log(`chat>`);
+            this.eventHandler.emit('login');
+            // this.clientInfo.state = "3";
+            // this.messenger.setUser();
+            // console.log(`chat>`);
         }else{
-            this.clientInfo.state = "1";
-            console.log(`${content}, please enter your name:`);
+            this.eventHandler.emit('logout');
+            // this.clientInfo.state = "1";
+            // console.log(`${content}, please enter your name:`);
         }
     }
 

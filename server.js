@@ -2,12 +2,19 @@ const WebSocket = require('ws');
 const serverConfig = require('./config/serverConfig.json');
 const wss = new WebSocket.Server({ port: serverConfig.port });
 
+const events = require('events');
+class EventHandler extends events{}
+const eventHandler = new EventHandler();
+
 wss.userService = require('./services/userService');
 wss.userService.setWss(wss);
+wss.userService.setEvents(eventHandler);
 wss.messageService = require('./services/messageService');
 wss.messageService.setWss(wss);
+wss.messageService.setEvents(eventHandler);
 wss.commandService = require('./services/commandService');
 wss.commandService.setWss(wss);
+wss.commandService.setEvents(eventHandler);
 
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(data) {

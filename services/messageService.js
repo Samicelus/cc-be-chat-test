@@ -5,15 +5,30 @@ const abuse = new Abuse();
 class MsgService{
     constructor(){
         this.wss;
+        this.eventHandler;
         this.chatLogs = [];
         this.setWss = this.setWss.bind(this);
+        this.setEvents = this.setEvents.bind(this);
         this.chat = this.chat.bind(this);
         this.saveMsg = this.saveMsg.bind(this);
         this.replyRecentMsg = this.replyRecentMsg.bind(this);
+        this.replyPopular = this.replyPopular.bind(this);
     }
 
     setWss(wss){
         this.wss = wss;
+    }
+
+    setEvents(eventHandler){
+        this.eventHandler = eventHandler;
+
+        let that = this;
+        this.eventHandler.on("popular", function(ws){
+            that.replyPopular(ws);
+        });
+        this.eventHandler.on("login", function(ws){
+            that.replyRecentMsg(ws);
+        });
     }
 
     saveMsg(user, content, time){

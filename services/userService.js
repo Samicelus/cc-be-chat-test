@@ -3,9 +3,13 @@ const moment = require('moment');
 class UserService{
     constructor(){
         this.wss;
+        this.eventHandler;
         this.users = {};
-        this.setWss = this.setWss.bind(this); 
+        this.setWss = this.setWss.bind(this);
+        this.setEvents = this.setEvents.bind(this);
         this.regist = this.regist.bind(this);
+        this.broadcastLogin = this.broadcastLogin.bind(this);
+        this.saveUser = this.saveUser.bind(this);
         this.toggleAlive = this.toggleAlive.bind(this);
         this.checkLeave = this.checkLeave.bind(this);
         this.leave = this.leave.bind(this);
@@ -17,36 +21,57 @@ class UserService{
         this.wss = wss;
     }
 
+    setEvents(eventHandler){
+        this.eventHandler = eventHandler;
+
+        let that = this;
+        this.eventHandler.on("status", function(ws, user){
+            that.replyStats(ws, user);
+        });
+        this.eventHandler.on("login", function(ws, user){
+            console.log(`[${new moment().format('YYYY-MM-DD HH:mm:ss')}] user: ${user} logged in...`);
+            that.saveUser(ws, user);
+            that.broadcastLogin(user);
+        });
+        this.eventHandler.on("userLeave",function(user){
+            that.leave(user);
+        });
+    }
+
     regist(user, ws){
         let message = {
             type: "regist"
         };
         if(!/\s+/.test(user) && user.trim() && !Object.keys(this.users).includes(user)){
-            this.users[user] = {
-                name: user,
-                loggedIn: new moment().format('YYYY-MM-DD HH:mm:ss'),
-                isAlive: true
-            };
-            console.log(`[${new moment().format('YYYY-MM-DD HH:mm:ss')}] user: ${user} logged in...`);
             message.content = "OK";
-            ws.socketid = user;
-            this.wss.clients.forEach((client) => {
-                if(client.socketid && client.socketid != user){
-                    let info = {
-                        type: "chat",
-                        content: `${user} has joined the room`,
-                        user: "system"
-                    }
-                    client.send(JSON.stringify(info));
-                }
-            });
-            this.wss.messageService.replyRecentMsg(ws);
+            this.eventHandler.emit("login", ws, user);
         }else{
-            console.log(`Invalid Username`);
             message.content = "Invalid Username";
         }
         console.log(`send regist cb to ${user}`);
         ws.send(JSON.stringify(message));
+    }
+
+    broadcastLogin(user){
+        this.wss.clients.forEach((client) => {
+            if(client.socketid && client.socketid != user){
+                let info = {
+                    type: "chat",
+                    content: `${user} has joined the room`,
+                    user: "system"
+                }
+                client.send(JSON.stringify(info));
+            }
+        });
+    }
+
+    saveUser(ws, user){
+        this.users[user] = {
+            name: user,
+            loggedIn: new moment().format('YYYY-MM-DD HH:mm:ss'),
+            isAlive: true
+        };
+        ws.socketid = user;
     }
 
     toggleAlive(){
@@ -58,7 +83,7 @@ class UserService{
     checkLeave(){
         for(let user in this.users){
             if(this.users[user].isAlive === false){
-                this.leave(user); 
+                this.eventHandler.emit("userLeave", user);
             }
         }
     }
