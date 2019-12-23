@@ -68,11 +68,7 @@ class MsgService{
     }
 
     replyPopular(ws){
-        let lastTime;
-        if(this.chatLogs[0]){
-            lastTime = this.chatLogs.slice(-1)[0].time;
-        }
-        let limit = moment(lastTime).subtract(5, 'second').format('YYYY-MM-DD HH:mm:ss');
+        let limit = moment().subtract(5, 'second').format('YYYY-MM-DD HH:mm:ss');
         let popularity = {};
         this.chatLogs.forEach((msg)=>{
             if(msg.time >= limit){
