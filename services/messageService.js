@@ -31,6 +31,7 @@ class MsgService{
         });
     }
 
+    //Todo buffer...
     saveMsg(user, content, time){
         if(this.chatLogs.length >= 50){
             this.chatLogs.shift();
