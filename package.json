@@ -9,11 +9,18 @@
   "author": "Theodore",
   "license": "ISC",
   "dependencies": {
-    "ava": "^2.4.0",
     "chai": "^4.2.0",
     "inquirer": "^6.2.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
     "ws": "^7.2.1"
+  },
+  "devDependencies": {
+    "ava": "^2.4.0"
+  },
+  "ava": {
+    "files": [
+      "test/*.js"
+    ]
   }
 }
