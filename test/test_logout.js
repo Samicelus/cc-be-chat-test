@@ -4,6 +4,11 @@ const serverConfig = require('../config/serverConfig.json');
 let wss;
 let dommyWs;
 
+function endTestWithErr(t, msg){
+    t.fail(msg);
+    t.end();
+}
+
 test.before(t => {
     wss = require('../server.js');
 });
@@ -31,20 +36,6 @@ test.cb('terminate connection', t => {
         }
     }
 
-    //other clients receive "system" message
-    dommyWs.on('message', function incoming(data) {
-        try{
-            let msgBody = JSON.parse(data);
-            if(msgBody.type == 'chat' && msgBody.user == 'system'){
-                t.is(msgBody.content, 'foo has joined the room');
-                assert += 1;
-                ifEnd();
-            }
-        }catch(e){
-            t.fail('msg unparsable in dommyWs');
-        }
-    });
-
     const ws = new WebSocket(`ws://${serverConfig.host}${serverConfig.port?":"+serverConfig.port:""}`);
 
     ws.on('open', function open() {
@@ -62,11 +53,28 @@ test.cb('terminate connection', t => {
             let msgBody = JSON.parse(data);
             if(msgBody.content == "OK"){
                 ws.terminate();
+                //other clients receive "system" message
+                dommyWs.on('message', function incoming(data) {
+                    try{
+                        let msgBody = JSON.parse(data);
+                        if(msgBody.type == 'chat' && msgBody.user == 'system'){
+                            t.is(msgBody.content, 'foo has leaved the room');
+                            assert += 1;
+                            ifEnd();
+                        }
+                    }catch(e){
+                        endTestWithErr(t, 'msg unparsable in dommyWs');
+                    }
+                });
             }
         }catch(e){
-            t.fail('msg unparsable in ws');
+            endTestWithErr(t, 'msg unparsable in ws');
         }
     });
+
+    setTimeout(function(){
+        endTestWithErr(t, '5s timeout');
+    },5000);
 });
 
 test.after('cleanup server', ()=>{

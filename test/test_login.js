@@ -4,6 +4,10 @@ const serverConfig = require('../config/serverConfig.json');
 let wss;
 let dommyWs;
 
+function endTestWithErr(t, msg){
+    t.fail(msg);
+    t.end();
+}
 
 test.before(t => {
     wss = require('../server.js');
@@ -42,7 +46,7 @@ test.cb('login with unused name', t => {
                 ifEnd();
             }
         }catch(e){
-            t.fail('msg unparsable in dommyWs');
+            endTestWithErr(t, 'msg unparsable in dommyWs');
         }
     });
 
@@ -65,9 +69,13 @@ test.cb('login with unused name', t => {
             assert += 1;
             ifEnd();
         }catch(e){
-            t.fail('msg unparsable in ws');
+            endTestWithErr(t, 'msg unparsable in ws');
         }
     });
+
+    setTimeout(function(){
+        endTestWithErr(t, '5s timeout');
+    },5000);
 });
 
 test.after('cleanup dommy cb', ()=>{
@@ -102,9 +110,13 @@ test.cb('login with exist name', t => {
             assert += 1;
             ifEnd();
         }catch(e){
-            t.fail('msg unparsable in ws');
+            endTestWithErr(t, 'msg unparsable in ws');
         }
     });
+
+    setTimeout(function(){
+        endTestWithErr(t, '5s timeout');
+    },5000);
 });
 
 test.after('cleanup dommy cb', ()=>{
@@ -139,9 +151,13 @@ test.cb('login with white space or null', t => {
             assert += 1;
             ifEnd();
         }catch(e){
-            t.fail('msg unparsable in ws');
+            endTestWithErr(t, 'msg unparsable in ws');
         }
     });
+
+    setTimeout(function(){
+        endTestWithErr(t, '5s timeout');
+    },5000);
 });
 
 test.after('cleanup server', ()=>{
