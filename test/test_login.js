@@ -1,10 +1,12 @@
 const test = require('ava');
 const WebSocket = require('ws');
 const serverConfig = require('../config/serverConfig.json');
+let wss;
 let dommyWs;
 
+
 test.before(t => {
-    require('../server.js');
+    wss = require('../server.js');
 });
 
 test.before(t => {
@@ -140,4 +142,8 @@ test.cb('login with white space or null', t => {
             t.fail('msg unparsable in ws');
         }
     });
+});
+
+test.after('cleanup server', ()=>{
+    wss.close();
 });

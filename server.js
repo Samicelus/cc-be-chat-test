@@ -62,3 +62,4 @@ setInterval(function ping() {
 
 console.log(`server start at port: ${serverConfig.port}`);
 
+module.exports = wss;
