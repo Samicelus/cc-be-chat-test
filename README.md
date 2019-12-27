@@ -35,6 +35,12 @@
 ]
 ```
 
+# test
+
+```
+$ava
+```
+
 # start server
 
 ```
